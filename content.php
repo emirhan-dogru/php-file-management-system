@@ -17,12 +17,14 @@ if ($result && !empty($result['routeFilePath'])) {
         require_once $filePath;
     } else {
         // Dosya yoksa 404
-        header("HTTP/1.0 404 Not Found");
         require_once '404.php'; // 404 sayfasını içer
+        return;
     }
 } else {
-    header("HTTP/1.0 404 Not Found");
+    require_once '404.php';
+    return;
 }
 ?>
+
 
 

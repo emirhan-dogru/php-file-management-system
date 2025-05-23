@@ -22,4 +22,15 @@
     <!-- Custom styles for this template-->
     <link href="./assets/css/sb-admin-2.min.css" rel="stylesheet">
 
+    <style>
+        /* Input'u gizlemek için */
+        #fileInput {
+            display: none;
+        }
+        /* Buton stilini özelleştirme (opsiyonel) */
+        .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
 </head>
