@@ -1,4 +1,13 @@
-<?php include './backend/system/connection.php';  ?>
+<?php
+include './backend/system/connection.php';
+
+// Database sınıfından örnek al
+$database = Database::getInstance();
+
+// İsteğe bağlı: FilesController örneği oluştur
+$controller = $database->bootstrap();
+$pdo = $database->getConnection();
+?>
 
 <!DOCTYPE html>
 <html lang="en">

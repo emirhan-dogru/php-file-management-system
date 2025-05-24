@@ -1,17 +1,67 @@
 <?php
 
-include 'settings.php';
+// include 'settings.php';
 
-try {
-    // PDO bağlantısı oluşturma
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+// try {
+//     // PDO bağlantısı oluşturma
+//     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+// } catch (PDOException $e) {
+//     // Hata durumunda mesaj gösterme
+//     echo "Bağlantı hatası: " . $e->getMessage();
+// }
 
-    // Veritabanından dosyaları çek
-     $stmt = $pdo->query("SELECT id, file_name, file_type, file_size, isShow, file_path FROM files ORDER BY upload_date DESC");
-    $files = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // Hata durumunda mesaj gösterme
-    echo "Bağlantı hatası: " . $e->getMessage();
+?>
+
+<?php
+require_once 'settings.php';
+require_once  __DIR__ . '/../oauth/FileController.php';
+
+class Database {
+    private static $instance = null;
+    private $pdo;
+
+    /**
+     * Özel constructor, dışarıdan doğrudan örnek oluşturmayı engeller.
+     */
+    private function __construct() {
+        global $host, $username, $password, $dbname;
+        try {
+            $this->pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            $this->pdo->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
+        } catch (PDOException $e) {
+            // Hata durumunda düz bir hata mesajı döndür ve logla
+            error_log("Veritabanı bağlantı hatası: " . $e->getMessage());
+            die("Bağlantı hatası: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Singleton örneği döndürür.
+     * @return Database
+     */
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * PDO bağlantısını döndürür.
+     * @return PDO
+     */
+    public function getConnection() {
+        return $this->pdo;
+    }
+
+    /**
+     * FilesController sınıfını başlatır.
+     * @return FileController
+     */
+    public function bootstrap() {
+        return new FileController($this->pdo);
+    }
 }
-
 ?>

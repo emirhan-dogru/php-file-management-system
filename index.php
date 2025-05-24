@@ -78,71 +78,92 @@
     <script src="./assets/js/demo/chart-area-demo.js"></script>
     <script src="./assets/js/demo/chart-pie-demo.js"></script>
 
-  <script>
-    $(document).ready(function() {
-        // Dosya input'una olay dinleyici ekleme
-        $('#fileInput').on('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return; // Dosya seçilmediyse çık
+    <script>
+        $(document).ready(function() {
+            // Dosya input'una olay dinleyici ekleme
+            $('#fileInput').on('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return; // Dosya seçilmediyse çık
 
-            const $form = $('#uploadForm');
-            const $button = $form.find('button');
-            $button.prop('disabled', true).text('Yükleniyor...');
+                const $form = $('#uploadForm');
+                const $button = $form.find('button');
+                $button.prop('disabled', true).text('Yükleniyor...');
 
-            const formData = new FormData($form[0]);
+                const formData = new FormData($form[0]);
 
-            $.ajax({
-                url: '<?php echo $domain ?>/upload.php',
-                type: 'POST',
-                data: formData,
-                processData: false, // FormData için gerekli
-                contentType: false, // FormData için gerekli
-                dataType: 'json',
-                success: function(result) {
-                    console.log(result);
-                    if (result.status === 'success') {
-                        // Tabloya yeni satır ekle
-                        const $tbody = $('#fileTableBody');
-                        const $noFilesRow = $tbody.find('tr td.text-center');
-                        if ($noFilesRow.length) {
-                            $tbody.empty(); // "Henüz dosya yüklenmedi" satırını kaldır
-                        }
+                $.ajax({
+                    url: '<?php echo $domain ?>/upload-file',
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // FormData için gerekli
+                    contentType: false, // FormData için gerekli
+                    dataType: 'json',
+                    success: function(result) {
+                        console.log(result);
+                        if (result.status === 'success') {
+                            // Tabloya yeni satır ekle
+                            const $tbody = $('#fileTableBody');
+                            const $noFilesRow = $tbody.find('tr td.text-center');
+                            if ($noFilesRow.length) {
+                                $tbody.empty(); // "Henüz dosya yüklenmedi" satırını kaldır
+                            }
 
-                        // isShow kontrolüne göre görüntüleme hücresini oluştur
-                        const displayCell = result.file.isShow
-                            ? `<td><img class="img-fluid" width="100" src="<?php echo $domain ?>/${result.file.file_path}" alt="${encodeURIComponent(result.file.file_name)}"></td>`
-                            : `<td>${encodeURIComponent(result.file.file_name)}</td>`;
+                            // isShow kontrolüne göre görüntüleme hücresini oluştur
+                            const displayCell = result.file.isShow ?
+                                `<td><img class="img-fluid" width="100" src="<?php echo $domain ?>/${result.file.file_path}" alt="${encodeURIComponent(result.file.file_name)}"></td>` :
+                                `<td>${result.file.file_name}</td>`;
 
-                        const newRow = `
+                            const newRow = `
                             <tr data-file-id="${result.file.id}">
                                 ${displayCell}
-                                <td>${encodeURIComponent(result.file.file_name)}</td>
+                                <td>${result.file.file_name}</td>
                                 <td>${result.file.file_type.replace('image/', '')}</td>
                                 <td>${(result.file.file_size / 1024).toFixed(2)} KB</td>
-                                <td><a class="btn btn-danger btn-sm btn-block" href="delete.php?id=${result.file.id}">Sil</a></td>
+                                <td style="align-content: center; justify-content: center;"><button class="btn btn-danger btn-sm btn-block delete-file" data-file-id="${result.file.id}">Sil</button></td>
                             </tr>
                         `;
-                        $tbody.prepend(newRow); // Yeni dosyayı en üste ekle
+                            $tbody.prepend(newRow); // Yeni dosyayı en üste ekle
 
-                        // Formu sıfırla
-                        $form[0].reset();
-                    } else {
-                        console.error('Yükleme hatası:', result.message);
-                        alert('Dosya yüklenemedi: ' + result.message);
+                            // Formu sıfırla
+                            $form[0].reset();
+                        } else {
+                            console.error('Yükleme hatası:', result.message);
+                            alert('Dosya yüklenemedi: ' + result.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Hata:', error);
+                        alert('Bir hata oluştu: ' + (xhr.responseJSON?.message || error));
+                    },
+                    complete: function() {
+                        // Yükleme göstergesini kaldır
+                        $button.prop('disabled', false).text('Dosya Yükle');
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Hata:', error);
-                    alert('Bir hata oluştu: ' + (xhr.responseJSON?.message || error));
-                },
-                complete: function() {
-                    // Yükleme göstergesini kaldır
-                    $button.prop('disabled', false).text('Dosya Yükle');
-                }
+                });
+            });
+
+            // Silme butonuna tıklama olayı
+            $(document).on('click', '.delete-file', function() {
+                const fileId = $(this).data('file-id');
+                    $.ajax({
+                        url: 'delete-file?file_id=' + fileId,
+                        type: 'DELETE',
+                        dataType: 'json',
+                        success: function(result) {
+                            if (result.status === 'success') {
+                                // Tabodan satırı kaldır
+                                $(`tr[data-file-id="${fileId}"]`).remove();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Hatası:', xhr.status, error);
+                            $('#message').removeClass('success error').addClass('error')
+                                .text('Dosya silinirken bir hata oluştu: ' + error);
+                        }
+                    });
             });
         });
-    });
-</script>
+    </script>
 
 </body>
 

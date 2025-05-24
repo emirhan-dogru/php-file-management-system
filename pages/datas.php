@@ -1,3 +1,5 @@
+<?php $files = $controller->getFiles(); ?>
+
 <div class="container-fluid">
 
     <!-- Page Heading -->
@@ -54,7 +56,7 @@
                                             <td><?php echo htmlspecialchars($file['file_name']); ?></td>
                                             <td><?php echo htmlspecialchars(str_replace('image/', '', $file['file_type'])); ?></td>
                                             <td><?php echo round($file['file_size'] / 1024, 2); ?> KB</td>
-                                            <td style="align-content: center; justify-content: center;"><a class="btn btn-danger btn-sm btn-block" href="delete.php?id=<?php echo $file['id']; ?>">Sil</a></td>
+                                            <td style="align-content: center; justify-content: center;"><button class="btn btn-danger btn-sm btn-block delete-file" data-file-id="<?php echo $file['id']; ?>">Sil</button></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
