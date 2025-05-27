@@ -45,7 +45,7 @@
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
+                <a class="nav-link" href="./logout">
                     <i class="fas fa-fw fa-sign-out-alt"></i>
                     <span>Çıkış Yap</span></a>
             </li>

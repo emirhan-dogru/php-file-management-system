@@ -99,7 +99,6 @@
                     contentType: false, // FormData için gerekli
                     dataType: 'json',
                     success: function(result) {
-                        console.log(result);
                         if (result.status === 'success') {
                             // Tabloya yeni satır ekle
                             const $tbody = $('#fileTableBody');
@@ -127,7 +126,6 @@
                             // Formu sıfırla
                             $form[0].reset();
                         } else {
-                            console.error('Yükleme hatası:', result.message);
                             alert('Dosya yüklenemedi: ' + result.message);
                         }
                     },
@@ -145,22 +143,24 @@
             // Silme butonuna tıklama olayı
             $(document).on('click', '.delete-file', function() {
                 const fileId = $(this).data('file-id');
-                    $.ajax({
-                        url: 'delete-file?file_id=' + fileId,
-                        type: 'DELETE',
-                        dataType: 'json',
-                        success: function(result) {
-                            if (result.status === 'success') {
-                                // Tabodan satırı kaldır
-                                $(`tr[data-file-id="${fileId}"]`).remove();
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('AJAX Hatası:', xhr.status, error);
-                            $('#message').removeClass('success error').addClass('error')
-                                .text('Dosya silinirken bir hata oluştu: ' + error);
+                $.ajax({
+                    url: 'delete-file?file_id=' + fileId,
+                    type: 'DELETE',
+                    dataType: 'json',
+                    success: function(result) {
+                        if (result.status === 'success') {
+                            // Tabodan satırı kaldır
+                            $(`tr[data-file-id="${fileId}"]`).remove();
+                        } else {
+                            alert('Dosya silinemedi: ' + result.message);
                         }
-                    });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Hatası:', xhr.status, error);
+                        $('#message').removeClass('success error').addClass('error')
+                            .text('Dosya silinirken bir hata oluştu: ' + error);
+                    }
+                });
             });
         });
     </script>

@@ -1,4 +1,4 @@
-<?php $files = $controller->getFiles(); ?>
+<?php $files = $fileController->getFiles(); ?>
 
 <div class="container-fluid">
 

@@ -1,20 +1,7 @@
 <?php
-
-// include 'settings.php';
-
-// try {
-//     // PDO bağlantısı oluşturma
-//     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-// } catch (PDOException $e) {
-//     // Hata durumunda mesaj gösterme
-//     echo "Bağlantı hatası: " . $e->getMessage();
-// }
-
-?>
-
-<?php
 require_once 'settings.php';
 require_once  __DIR__ . '/../oauth/FileController.php';
+require_once  __DIR__ . '/../oauth/UserController.php';
 
 class Database {
     private static $instance = null;
@@ -30,6 +17,7 @@ class Database {
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             $this->pdo->exec("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
+            $this->pdo->exec("SET time_zone = '+03:00';");
         } catch (PDOException $e) {
             // Hata durumunda düz bir hata mesajı döndür ve logla
             error_log("Veritabanı bağlantı hatası: " . $e->getMessage());
@@ -61,7 +49,10 @@ class Database {
      * @return FileController
      */
     public function bootstrap() {
-        return new FileController($this->pdo);
+        return [
+            'UserController' => new UserController($this->pdo),
+            'FileController' => new FileController($this->pdo)
+        ];
     }
 }
 ?>

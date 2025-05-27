@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../system/connection.php';
 require_once __DIR__ . '/../system/Utils.php';
+require_once __DIR__ . '/../oauth/UserController.php';
 
 class FileController {
     private $pdo;
@@ -15,15 +16,34 @@ class FileController {
         'image/x-xpixmap'
     ];
 
+    private $userController;
+
     public function __construct($pdo) {
         $this->pdo = $pdo;
         // Upload dizininin varlığını kontrol et, yoksa oluştur
         if (!file_exists($this->uploadDir)) {
             mkdir($this->uploadDir, 0777, true);
         }
+
+        // UserController'ı başlat
+        $this->userController = new UserController($pdo);
+    }
+
+    private function VerifyToken() {
+        // Token kontrolü constructor'da yapılır
+        $token = $_COOKIE['jwt_token'] ?? '';
+        if (!$token || !$this->userController->verifyToken($token)) {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Oturum süresi doldu. Lütfen tekrar giriş yapın.'
+            ]);
+            exit;
+        }
     }
 
     public function uploadFile($file) {
+        $this->VerifyToken();
         header('Content-Type: application/json; charset=utf-8');
 
         if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
@@ -92,6 +112,7 @@ class FileController {
 
     public function getFiles() {
         try {
+            $this->VerifyToken();
             $stmt = $this->pdo->query("SELECT id, file_name, file_type, file_size, isShow, file_path FROM files ORDER BY upload_date DESC");
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -104,6 +125,7 @@ class FileController {
 
     public function deleteFile($fileId) {
     try {
+        $this->VerifyToken();
         $stmt = $this->pdo->prepare("SELECT file_path FROM files WHERE id = :id");
         $stmt->execute([':id' => $fileId]);
         $file = $stmt->fetch();

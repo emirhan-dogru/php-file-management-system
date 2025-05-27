@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1:3306
--- Üretim Zamanı: 23 May 2025, 18:09:41
+-- Üretim Zamanı: 27 May 2025, 12:27:55
 -- Sunucu sürümü: 9.1.0
 -- PHP Sürümü: 8.3.14
 
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `files` (
   `file_size` int NOT NULL,
   `upload_date` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
 
 --
 -- Tablo döküm verisi `files`
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `routes` (
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
 
 --
 -- Tablo döküm verisi `routes`
@@ -72,6 +72,58 @@ INSERT INTO `routes` (`id`, `routeName`, `routeFilePath`, `createdAt`, `updatedA
 (1, 'profile', './pages/my-profile.php', '2025-05-21 21:06:55', '2025-05-21 21:11:18'),
 (2, '', './pages/homepage.php', '2025-05-21 21:14:55', '2025-05-21 21:14:55'),
 (3, 'my-datas', './pages/datas.php', '2025-05-22 10:43:22', '2025-05-22 10:43:22');
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `tokens`
+--
+
+DROP TABLE IF EXISTS `tokens`;
+CREATE TABLE IF NOT EXISTS `tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token` varchar(500) COLLATE utf8mb4_turkish_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `expires_at` datetime NOT NULL,
+  `is_valid` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+
+--
+-- Tablo döküm verisi `tokens`
+--
+
+INSERT INTO `tokens` (`id`, `user_id`, `token`, `created_at`, `expires_at`, `is_valid`) VALUES
+(1, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL2ZpbGUtbWFuYWdlbWVudCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdFwvZmlsZS1tYW5hZ2VtZW50IiwiaWF0IjoxNzQ4MTMxNzY4LCJleHAiOjE3NDgxMzUzNjgsInVzZXJfaWQiOjEsImVtYWlsIjoidGVzdEBlbWlyaGFuZG9ncnUuY29tLnRyIiwidXNlcm5hbWUiOiJFbWlyaGFuIERvXHUwMTFmcnUifQ.bcoYpsQ40JnxJLw2py8Swvd2bvI2vLPV1sUHJ2vs3-c', '2025-05-25 03:09:28', '2025-05-25 05:09:28', 0),
+(8, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL2ZpbGUtbWFuYWdlbWVudCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdFwvZmlsZS1tYW5hZ2VtZW50IiwiaWF0IjoxNzQ4MTYyNTMwLCJleHAiOjE3NDgxNjYxMzAsInVzZXJfaWQiOjEsImVtYWlsIjoidGVzdEBlbWlyaGFuZG9ncnUuY29tLnRyIiwidXNlcm5hbWUiOiJFbWlyaGFuIERvXHUwMTFmcnUiLCJqdGkiOiJlMzg4YTNiZC0zN2U4LTQzNjItYTA5ZS1kYjY3ZDdhOGJmZjUifQ.fXKJ0wO0icvTpMoE3_aEj_RVANlMkM3nOsx2vh1hzwU', '2025-05-25 11:42:10', '2025-05-25 11:42:10', 0),
+(9, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL2ZpbGUtbWFuYWdlbWVudCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdFwvZmlsZS1tYW5hZ2VtZW50IiwiaWF0IjoxNzQ4MTYzMzQwLCJleHAiOjE3NDgxNjY5NDAsInVzZXJfaWQiOjEsImVtYWlsIjoidGVzdEBlbWlyaGFuZG9ncnUuY29tLnRyIiwidXNlcm5hbWUiOiJFbWlyaGFuIERvXHUwMTFmcnUiLCJqdGkiOiJmMDZhOGM2Yy00MjQ0LTQ2ZWEtYjI1NS1kMDNkNjI2ZjFlZDIifQ.VzqmARwFtf4O7uxU_0xOhXqgza0-xhd9hHSQWV-no8o', '2025-05-25 11:55:40', '2025-05-25 11:55:40', 0),
+(20, 1, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3RcL2ZpbGUtbWFuYWdlbWVudCIsImF1ZCI6Imh0dHA6XC9cL2xvY2FsaG9zdFwvZmlsZS1tYW5hZ2VtZW50IiwiaWF0IjoxNzQ4MzQ4ODE4LCJleHAiOjE3NDgzNTI0MTgsInVzZXJfaWQiOjEsImVtYWlsIjoidGVzdEBlbWlyaGFuZG9ncnUuY29tLnRyIiwidXNlcm5hbWUiOiJFbWlyaGFuIERvXHUwMTFmcnUiLCJqdGkiOiI3YTE0NDIwMi1jMmNmLTRmOGItOWNjMS0xNjczNzNmZGZiNjcifQ.Z-Cs28tikUvW9GwekuNZRZFrGtFdfJN3WTkWSSsK4eQ', '2025-05-27 15:26:58', '2025-05-27 16:26:58', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(191) COLLATE utf8mb4_turkish_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_turkish_ci NOT NULL,
+  `username` varchar(100) COLLATE utf8mb4_turkish_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+
+--
+-- Tablo döküm verisi `users`
+--
+
+INSERT INTO `users` (`id`, `email`, `password`, `username`, `created_at`) VALUES
+(1, 'test@emirhandogru.com.tr', '$2y$10$lU3iV1yAo.4bi0CiIMSQP.vO9o58YAE4QxhRhprr3ke4xr2k86UNC', 'Emirhan Doğru', '2025-05-25 02:55:46');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

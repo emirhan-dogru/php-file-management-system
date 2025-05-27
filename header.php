@@ -5,8 +5,25 @@ include './backend/system/connection.php';
 $database = Database::getInstance();
 
 // İsteğe bağlı: FilesController örneği oluştur
-$controller = $database->bootstrap();
+// Tüm kontrolörleri al
+$controllers = $database->bootstrap();
+
+// UserController'ı diziden al
+$userController = $controllers['UserController'];
+$fileController = $controllers['FileController'];
+
 $pdo = $database->getConnection();
+
+// Token kontrolü
+$token = $_COOKIE['jwt_token'] ?? '';
+
+if (!$token) {
+    header('Location: login');
+    exit;
+} else if (!$userController->verifyToken($token)) {
+    header('Location: login?error=' . urlencode('Oturum geçersiz. Lütfen giriş yapın.'));
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,6 +53,7 @@ $pdo = $database->getConnection();
         #fileInput {
             display: none;
         }
+
         /* Buton stilini özelleştirme (opsiyonel) */
         .btn-primary {
             padding: 10px 20px;
