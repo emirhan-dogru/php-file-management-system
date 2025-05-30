@@ -114,4 +114,71 @@ class UserController
             return false;
         }
     }
+
+    public function register($name, $surname, $email, $password, $repassword)
+    {
+        try {
+            if (empty($name) || empty($surname) || empty($email) || empty($password) || empty($repassword)) {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Tüm alanları doldurun.'
+                ]);
+                exit;
+            }
+            elseif ($password !== $repassword) {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Parolalar eşleşmiyor.'
+                ]);
+                exit;
+            }
+            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Geçerli bir e-posta adresi girin.'
+                ]);
+                exit;
+            }
+            elseif (strlen($password) < 8) {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Parola en az 8 karakter olmalı.'
+                ]);
+                exit;
+            }
+
+            // E-posta adresinin daha önce kayıtlı olup olmadığını kontrol et
+            $stmt = $this->pdo->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+            if ($stmt->fetch()) {
+                return json_encode([
+                    'status' => 'error',
+                    'message' => 'Bu e-posta adresi zaten kayıtlı.'
+                ], JSON_UNESCAPED_UNICODE);
+            }
+
+            // Şifreyi hash'le
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            $username = $name . ' ' . $surname;
+
+            // Kullanıcıyı veritabanına ekle
+            $stmt = $this->pdo->prepare("INSERT INTO users (email, password, username) VALUES (:email, :password, :username)");
+            $stmt->execute([
+                ':email' => $email,
+                ':password' => $hashedPassword,
+                ':username' => $username
+            ]);
+
+            return json_encode([
+                'status' => 'success',
+                'message' => 'Kayıt başarılı! Lütfen giriş yapın.'
+            ], JSON_UNESCAPED_UNICODE);
+        } catch (PDOException $e) {
+            return json_encode([
+                'status' => 'error',
+                'message' => 'Kayıt başarısız. Veritabanı hatası: ' . $e->getMessage()
+            ], JSON_UNESCAPED_UNICODE);
+        }
+    }
 }

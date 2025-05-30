@@ -1,7 +1,7 @@
 <?php
 require_once './backend/system/connection.php';
 require_once './backend/oauth/UserController.php';
-
+require_once './backend/system/utils.php';
 
 
 $database = Database::getInstance();
@@ -14,8 +14,8 @@ if ($token && $userController->verifyToken($token)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'] ?? '';
+    $email = Utils::secure(filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
+    $password = Utils::secure($_POST['password']);
 
     if (empty($email) || empty($password)) {
         header('Location: login?error=' . urlencode('E-posta ve parola gerekli.'));
@@ -39,10 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 } 
-//else {
-//     header('Location: login.php?error=' . urlencode('Yalnızca POST istekleri destekleniyor.'));
-//     exit;
-// }
+
+$flashMessage = Utils::getMessage('register_message');
 ?>
 
 <!DOCTYPE html>
@@ -84,6 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="row" style="justify-content: center;">
                             <div class="col-lg-6">
                                 <div class="p-5">
+                                    <?php if ($flashMessage): ?>
+                                        <div class="alert alert-success alert-dismissible fade show flash-message" role="alert">
+                                            <?php echo htmlspecialchars($flashMessage); ?>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    <?php endif; ?>
                                     <?php if (isset($_GET['error'])): ?>
                                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                             <?php echo htmlspecialchars($_GET['error']); ?>
@@ -103,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-lg"  name="password"
-                                                id="exampleInputPassword" placeholder="Password">
+                                                id="exampleInputPassword" placeholder="Parola">
                                         </div>
                                         <button type="submit" class="btn btn-secondary btn-user btn-block">
                                             Giriş Yap
@@ -111,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <a class="small" href="forgot-password.html">Ücretsiz Kayıt ol!</a>
+                                        <a class="small" href="./register">Ücretsiz Kayıt ol!</a>
                                     </div>
                                 </div>
                             </div>

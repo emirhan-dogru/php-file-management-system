@@ -1,29 +1,67 @@
 <?php
-class Utils {
-    public static function generateGuid() {
+class Utils
+{
+    public static function generateGuid()
+    {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
             mt_rand(0, 0xffff),
             mt_rand(0, 0x0fff) | 0x4000,
             mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
         );
     }
 
-    public static function base64UrlEncode($data) {
+    public static function setMessage($key, $value)
+    {
+        $_SESSION['flash'][$key] = $value;
+    }
+
+    public static function getMessage($key)
+    {
+        if (isset($_SESSION['flash'][$key])) {
+            $value = $_SESSION['flash'][$key];
+            unset($_SESSION['flash'][$key]);
+            return $value;
+        }
+        return null;
+    }
+
+    public static function secure(string $text)
+    {
+        // Alanın varlığını kontrol et, yoksa boş string ata
+        $value = isset($text) ? $text : '';
+
+        // Süzgeçten geçir: trim ve htmlspecialchars
+        $value = trim($value);
+        $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+
+        // Temizlenmiş veriyi diziye ekle
+        $filteredData = $value;
+
+        return $filteredData;
+    }
+
+    public static function base64UrlEncode($data)
+    {
         $base64 = base64_encode($data);
         $base64Url = strtr($base64, '+/', '-_');
         return rtrim($base64Url, '=');
     }
 
-    public static function base64UrlDecode($data) {
+    public static function base64UrlDecode($data)
+    {
         $base64 = strtr($data, '-_', '+/');
         $base64Padded = str_pad($base64, strlen($base64) % 4, '=', STR_PAD_RIGHT);
         return base64_decode($base64Padded);
     }
 
-    public static function createJwt($payload, $secret) {
+    public static function createJwt($payload, $secret)
+    {
         // Benzersiz bir jti ekle (isteğe bağlı olarak generateGuid kullanılabilir)
         if (!isset($payload['jti'])) {
             $payload['jti'] = self::generateGuid();
@@ -42,7 +80,8 @@ class Utils {
         return $encodedHeader . '.' . $encodedPayload . '.' . $encodedSignature;
     }
 
-    public static function verifyJwt($jwt, $secret) {
+    public static function verifyJwt($jwt, $secret)
+    {
         $parts = explode('.', $jwt);
         if (count($parts) !== 3) {
             return false;
@@ -70,4 +109,3 @@ class Utils {
         return $payload;
     }
 }
-?>
