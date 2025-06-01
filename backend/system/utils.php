@@ -1,6 +1,28 @@
 <?php
 class Utils
 {
+    public static function getCurrentRoutePath(string $basePath)
+    {
+        $requestUri = $_SERVER['REQUEST_URI'];
+
+        // Sorgu parametrelerini temizle (?param=123 vs)
+        $requestUri = parse_url($requestUri, PHP_URL_PATH);
+
+        // basePath'i temizle
+        $path = str_replace($basePath, '', $requestUri);
+
+        // Baştaki ve sondaki / karakterlerini temizle
+        $path = trim($path, '/');
+
+        return ($path === '' || $path === '/') ? '' : $path;
+    }
+
+    public static function isActiveRoute(string $route): string
+    {
+        global $basePath; // Eğer dışarıda tanımlıysa
+        return Utils::getCurrentRoutePath($basePath) === $route ? 'active' : '';
+    }
+
     public static function generateGuid()
     {
         return sprintf(

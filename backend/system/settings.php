@@ -1,5 +1,6 @@
 <?php
 
+ob_start();
 session_start();
 
 date_default_timezone_set('Europe/Istanbul');
@@ -9,6 +10,10 @@ date_default_timezone_set('Europe/Istanbul');
 => hostingte gerçek adres belirtilmelidir örn(https://www.google.com)
 */
 $domain = 'http://localhost/file-management';
+
+
+// projenin kurulu olduğu dosya dizini
+$basePath = '/file-management/';
 
 
 // veritabanı hostname

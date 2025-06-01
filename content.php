@@ -1,13 +1,9 @@
 <?php
 // Mevcut path'i al
-$basePath = "/file-management/";
-$requestUri = $_SERVER['REQUEST_URI'];
-$path = str_replace($basePath, '', $requestUri);
-$path = trim($path, '/');
-$path = ($path === '' || $path === '/') ? '' : $path;
+$currentPath = Utils::getCurrentRoutePath($basePath);
 
 $stmt = $pdo->prepare("SELECT routeFilePath FROM routes WHERE routeName = :path LIMIT 1");
-$stmt->execute([':path' => $path]);
+$stmt->execute([':path' => $currentPath]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($result && !empty($result['routeFilePath'])) {
@@ -17,11 +13,11 @@ if ($result && !empty($result['routeFilePath'])) {
         require_once $filePath;
     } else {
         // Dosya yoksa 404
-        require_once '404.php'; // 404 sayfasını içer
+        require_once './pages/404.php'; // 404 sayfasını içer
         return;
     }
 } else {
-    require_once '404.php';
+    require_once './pages/404.php';
     return;
 }
 ?>

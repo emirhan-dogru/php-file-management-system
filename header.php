@@ -20,8 +20,17 @@ $token = $_COOKIE['jwt_token'] ?? '';
 if (!$token) {
     header('Location: login');
     exit;
-} else if (!$userController->verifyToken($token)) {
+} else if (!$payload = $userController->verifyToken($token)) {
     header('Location: login?error=' . urlencode('Oturum geçersiz. Lütfen giriş yapın.'));
+    exit;
+}
+
+$userId = $payload['user_id'];
+
+// Kullanıcı bilgilerini al
+$user = $userController->getUserById($userId);
+if (!$user) {
+    header('Location: ./login');
     exit;
 }
 ?>

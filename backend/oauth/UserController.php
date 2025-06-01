@@ -124,22 +124,19 @@ class UserController
                     'message' => 'Tüm alanları doldurun.'
                 ]);
                 exit;
-            }
-            elseif ($password !== $repassword) {
+            } elseif ($password !== $repassword) {
                 return json_encode([
                     'status' => 'error',
                     'message' => 'Parolalar eşleşmiyor.'
                 ]);
                 exit;
-            }
-            elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return json_encode([
                     'status' => 'error',
                     'message' => 'Geçerli bir e-posta adresi girin.'
                 ]);
                 exit;
-            }
-            elseif (strlen($password) < 8) {
+            } elseif (strlen($password) < 8) {
                 return json_encode([
                     'status' => 'error',
                     'message' => 'Parola en az 8 karakter olmalı.'
@@ -160,7 +157,7 @@ class UserController
             // Şifreyi hash'le
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            $username = $name . ' ' . $surname;
+                $username = $name . ' ' . $surname;
 
             // Kullanıcıyı veritabanına ekle
             $stmt = $this->pdo->prepare("INSERT INTO users (email, password, username) VALUES (:email, :password, :username)");
@@ -179,6 +176,85 @@ class UserController
                 'status' => 'error',
                 'message' => 'Kayıt başarısız. Veritabanı hatası: ' . $e->getMessage()
             ], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    public function getUserById($userId)
+    {
+        try {
+
+            $stmt = $this->pdo->prepare("SELECT id, email, username FROM users WHERE id = :id");
+            $stmt->execute([':id' => $userId]);
+            return $stmt->fetch();
+
+        } catch (PDOException $e) {
+            error_log('Kullanıcı getirme hatası: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateProfile($userId, $name, $surname, $email)
+    {
+        try {
+            if (empty($name)) {
+                return json_encode(['status' => 'error', 'message' => 'Ad alanı zorunludur.']);
+            }
+            if (empty($surname)) {
+                return json_encode(['status' => 'error', 'message' => 'Soyad alanı zorunludur.']);
+            }
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return json_encode(['status' => 'error', 'message' => 'Geçersiz e-posta adresi.']);
+            }
+
+            // E-posta değiştirilmesine izin yok, mevcut e-postayı kontrol et
+            $stmt = $this->pdo->prepare("SELECT email FROM users WHERE id = :id");
+            $stmt->execute([':id' => $userId]);
+            $currentEmail = $stmt->fetchColumn();
+
+            if ($email !== $currentEmail) {
+                return json_encode(['status' => 'error', 'message' => 'E-posta adresi değiştirilemez.']);
+            }
+
+            $stmt = $this->pdo->prepare("UPDATE users SET username = :username WHERE id = :id");
+            $stmt->execute([
+                ':id' => $userId,
+                ':username' => $name . ' ' . $surname,
+            ]);
+
+            return json_encode(['status' => 'success', 'message' => 'Profil bilgileri güncellendi.']);
+        } catch (PDOException $e) {
+            return json_encode(['status' => 'error', 'message' => 'Profil güncelleme hatası: ' . $e->getMessage()]);
+        }
+    }
+
+    public function changePassword($userId, $currentPassword, $newPassword, $confirmPassword)
+    {
+        try {
+            if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                return json_encode(['status' => 'error', 'message' => 'Tüm şifre alanları zorunludur.']);
+            }
+            if ($newPassword !== $confirmPassword) {
+                return json_encode(['status' => 'error', 'message' => 'Yeni şifreler eşleşmiyor.']);
+            }
+            if (strlen($newPassword) < 8) {
+                return json_encode(['status' => 'error', 'message' => 'Yeni şifre en az 8 karakter olmalı.']);
+            }
+
+            $stmt = $this->pdo->prepare("SELECT password FROM users WHERE id = :id");
+            $stmt->execute([':id' => $userId]);
+            $storedPassword = $stmt->fetchColumn();
+
+            if (!password_verify($currentPassword, $storedPassword)) {
+                return json_encode(['status' => 'error', 'message' => 'Mevcut şifre yanlış.']);
+            }
+
+            $newHashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $this->pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
+            $stmt->execute([':password' => $newHashedPassword, ':id' => $userId]);
+
+            return json_encode(['status' => 'success', 'message' => 'Şifreniz başarıyla değiştirildi.']);
+        } catch (PDOException $e) {
+            return json_encode(['status' => 'error', 'message' => 'Şifre değiştirme hatası: ' . $e->getMessage()]);
         }
     }
 }

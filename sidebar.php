@@ -12,7 +12,7 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active">
+            <li class="nav-item <?= Utils::isActiveRoute('') ?>">
                 <a class="nav-link" href="<?php echo $domain ?>">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -22,8 +22,8 @@
             <hr class="sidebar-divider">
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="<?php echo $domain ?>/my-datas">
+            <li class="nav-item <?= Utils::isActiveRoute('home') ?>">
+                <a class="nav-link" href="<?php echo $domain ?>/home">
                     <i class="fas fa-fw fa-folder"></i>
                     <span>Dosya Yönetimi</span></a>
             </li>
@@ -37,8 +37,8 @@
             </div>
 
             <!-- Nav Item - Charts -->
-            <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+            <li class="nav-item <?= Utils::isActiveRoute('profile') ?>">
+                <a class="nav-link" href="<?php echo $domain ?>/profile">
                     <i class="fas fa-fw fa-user"></i>
                     <span>Profilim</span></a>
             </li>
