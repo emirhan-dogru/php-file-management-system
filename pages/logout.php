@@ -1,6 +1,6 @@
 <?php
 
-include './backend/system/connection.php';
+include '../backend/system/connection.php';
 
 $database = Database::getInstance();
 

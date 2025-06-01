@@ -9,7 +9,18 @@ $database = Database::getInstance();
 
 $controllers = $database->bootstrap();
 
+$userController = $controllers['UserController'];
 $fileController = $controllers['FileController'];
+
+$token = $_COOKIE['jwt_token'] ?? '';
+
+if (!$token || !$userController->verifyToken($token)) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Geçersiz oturum. Lütfen Giriş Yapın'
+    ]);
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($_GET['file_id'])) {
     $fileId = filter_input(INPUT_GET, 'file_id', FILTER_VALIDATE_INT);
@@ -21,6 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && isset($_GET['file_id'])) {
         exit;
     }
     echo $fileController->deleteFile($fileId);
+    exit;
+} else {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Geçersiz istek.'
+    ]);
     exit;
 }
 ?>

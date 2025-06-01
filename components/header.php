@@ -1,6 +1,4 @@
 <?php
-include './backend/system/connection.php';
-
 // Database sınıfından örnek al
 $database = Database::getInstance();
 
@@ -18,10 +16,10 @@ $pdo = $database->getConnection();
 $token = $_COOKIE['jwt_token'] ?? '';
 
 if (!$token) {
-    header('Location: login');
+    header("Location: $domain/login");
     exit;
 } else if (!$payload = $userController->verifyToken($token)) {
-    header('Location: login?error=' . urlencode('Oturum geçersiz. Lütfen giriş yapın.'));
+    header("Location: $domain/login?error=" . urlencode('Oturum geçersiz. Lütfen giriş yapın.'));
     exit;
 }
 
@@ -49,13 +47,13 @@ if (!$user) {
     <title>SB Admin 2 - Dashboard</title>
 
     <!-- Custom fonts for this template-->
-    <link href="./assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="<?= $domain ?>/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="./assets/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="<?= $domain ?>/assets/css/sb-admin-2.min.css" rel="stylesheet">
 
     <style>
         /* Input'u gizlemek için */

@@ -9,7 +9,6 @@ $database = Database::getInstance();
 
 $controllers = $database->bootstrap();
 
-// UserController'ı diziden al
 $fileController = $controllers['FileController'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
